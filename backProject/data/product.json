@@ -1,13 +1,11 @@
 [
   {
-    "id": 1,
-    "title": "Producto test",
-    "description": "Probando el POST",
-    "code": "ABC123",
-    "price": 100,
-    "status": true,
-    "stock": 5,
-    "category": "pruebas",
+    "id": 2,
+    "title": "El Héroe de Las Heras",
+    "author": "Brandon Sanderson",
+    "price": "65000",
+    "stock": "48",
+    "category": "Fantasía Épica",
     "thumbnail": []
   }
 ]

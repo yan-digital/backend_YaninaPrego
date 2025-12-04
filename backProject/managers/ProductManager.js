@@ -30,10 +30,8 @@ class ProductManager{
     const newProduct = {
       id: newId,
       title: productData.title,
-      description: productData.description,
-      code: productData.code,
+      author: productData.author,
       price: productData.price,
-      status: productData.status ?? true,
       stock: productData.stock,
       category: productData.category,
       thumbnail: productData.thumbnail || []

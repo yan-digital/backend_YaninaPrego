@@ -2,6 +2,33 @@
 
 <ul id="product-list">
   {{#each products}}
-    <li>{{this.title}} - ${{this.price}}</li>
+    <li>
+      <b>{{this.title}}</b>  
+        Autor: {{this.author}}  
+        Precio: ${{this.price}}  
+        Stock: {{this.stock}}  
+        Categoría: {{this.category}}
+    </li>
   {{/each}}
 </ul>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  const socket = io();
+
+  socket.on("productosActualizados", (products) => {
+      const list = document.getElementById("productList");
+      list.innerHTML = "";
+      products.forEach(p => {
+          list.innerHTML += `
+              <li>
+                <b>${p.title}</b>  
+                Autor: ${p.author}  
+                Precio: $${p.price}  
+                Stock: ${p.stock}  
+                Categoría: ${p.category}
+              </li>`;
+      });
+  });
+</script>
