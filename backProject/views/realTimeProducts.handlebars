@@ -16,11 +16,11 @@
 <ul id="productList">
     {{#each products}}
       <li>
-        <b>{{this.title}}</b>  
-        Autor: {{this.author}}  
-        Precio: ${{this.price}}  
-        Stock: {{this.stock}}  
-        Categoría: {{this.category}}
+        Título: <b>{{this.title}}</b>  <br>
+        Autor: <b>{{this.author}}</b>  <br>
+        Precio: <b>${{this.price}}</b> <br> 
+        Stock: <b>{{this.stock}}</b>  <br>
+        Categoría: <b>{{this.category}}</b>
       </li>
     {{/each}}
 </ul>
@@ -39,7 +39,6 @@
         const formData = new FormData(form);
         const product = Object.fromEntries(formData);
 
-
         socket.emit("nuevoProducto", product);
 
         form.reset();
@@ -51,11 +50,11 @@
         products.forEach(p => {
             productList.innerHTML +=  `
               <li>
-                <b>${p.title}</b>  
-                Autor: ${p.author}  
-                Precio: $${p.price}  
-                Stock: ${p.stock}  
-                Categoría: ${p.category}
+                Título: <b>${p.title}</b>  <br>
+                Autor: <b>${p.author}</b> <br>
+                Precio: <b>$${p.price}</b>  <br>
+                Stock: <b>${p.stock}</b>  <br>
+                Categoría:<b>${p.category}</b>
               </li>`;
     });
     }); 
