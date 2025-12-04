@@ -3,7 +3,7 @@ import CartManager from '../managers/CartManager.js';
 
 const router = Router();
 
-const cartManager = new CartManager('./src/data/carts.json');
+const cartManager = new CartManager('data/cart.json');
 
 router.post('/', async(req, res) =>{
   const newCart = await cartManager.createCart();
@@ -14,7 +14,7 @@ router.get('/:cid', async(req, res) =>{
   const cid = req.params.cid;
   const cart = await cartManager.getCartById(cid);
   if(cart){
-    res.json(cart.products);
+    res.json(cart);
   }else{
     res.status(404).json({error: 'el carrito no se encuentra'});
   }
@@ -22,7 +22,7 @@ router.get('/:cid', async(req, res) =>{
 
 router.post('/:cid/product/:pid', async(req, res) =>{
   const {cid, pid} = req.params;
-  const result = await cartManager.addProductCart(cid, pid);
+  const result = await cartManager.addProductsToCart(cid, pid);
   res.json(result);
 });
 

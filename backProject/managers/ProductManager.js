@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 class ProductManager{
   constructor(filePath){
-    this.path = path.resolve(__dirname, '...', filePath);
+    this.path = path.resolve(__dirname, '..', filePath);
   }
 
   async getProducts(){
@@ -19,9 +19,9 @@ class ProductManager{
     }
   }
 
-  async getProductsById(id){
+  async getProductById(id){
     const products = await this.getProducts();
-    return products.find(p => p.id === id);
+    return products.find(p => p.id == id);
   }
 
   async addProduct(productData){
@@ -44,14 +44,18 @@ class ProductManager{
   }
 
   async updateProduct(id, updates){
-    const products = await this.products();
-    const index = products.findIndex(p => id === id);
-    if (index === -1) return {error: 'no se encontro producto'};
+    const products = await this.getProducts();
+    const index = products.findIndex(p => p.id == id);
+
+    if (index == -1) return {error: 'no se encontro producto'};
 
     delete updates.id;
-    products[index] = {...products [index], ...updates};
+
+    products[index] = {...products[index], ...updates};
+
     await fs.writeFile(this.path, JSON.stringify(products, null, 2));
     return products[index];
+    
   }
 
   async deleteProduct(id){

@@ -1,0 +1,24 @@
+<h1>Productos en tiempo real</h1>
+
+<ul id="realtime-list"></ul>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  socket.on("productosActualizados", async () => {
+    const res = await fetch("/api/products");
+    const products = await res.json();
+
+    const list = document.getElementById("realtime-list");
+    list.innerHTML = "";
+
+    products.forEach(p => {
+      const li = document.createElement("li");
+      li.textContent = `${p.title} - $${p.price}`;
+      list.appendChild(li);
+    });
+  });
+
+  socket.emit("productosActualizados");
+</script>
