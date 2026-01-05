@@ -8,6 +8,9 @@ const productManager = new ProductManager('data/product.json');
 
 router.post('/', async (req,res)=>{
   const newProduct = await productManager.addProduct(req.body);
+  if(newProduct.error){
+    return res.status(400).json(newProduct);
+  }
   io.emit('productosActualizados');
   res.status(201).json(newProduct);
 });

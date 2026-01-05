@@ -1,3 +1,4 @@
+import { error } from 'console';
 import {promises as fs} from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -15,13 +16,25 @@ class cartManager{
       const data = await fs.readFile(this.path, 'utf-8');
       return JSON.parse(data);
     }catch{
-      return [];
+      return [ ];
+    }
+  }
+
+  async saveCarts(carts){
+    try{
+      await fs.writeFile(this.path, JSON.stringify(carts, null, 2));
+    } catch(err){
+      return {error: 'no se pudo guardar el carrito'};
     }
   }
 
   async createCart(){
     const carts = await this.getCarts();
-    const newId = carts.length > 0 ? carts.at(-1).id + 1 : 1;
+    if(!Array.isArray(carts)){
+      return {error: 'Formato no valido'};
+    }
+    const newId = 
+      carts.length > 0 && typeof carts.at(-1).id == 'number' ? carts.at(-1).id + 1: 1;
 
     const newCart = {
       id: newId,
@@ -29,7 +42,8 @@ class cartManager{
     }
 
     carts.push(newCart);
-    await fs.writeFile(this.path, JSON.stringify(carts, null, 2));
+    const result = await this.saveCarts(carts);
+    if (result?.error) return result;
     return newCart;
   }
 
@@ -39,18 +53,41 @@ class cartManager{
   }
 
   async addProductsToCart(cartId, productId){
+    cartId = Number(cartId);
+    productId = Number(productId);
+
+    if(isNaN(cartId) || isNaN(productId)){
+      return {error: 'ID invalido'};
+    } 
+
     const carts = await this.getCarts();
     const cart = carts.find(c => c.id == cartId);
 
     if(!cart) return {error: 'carrito no encontrado'}
 
-    const existingProduct = cart.products.find(p => p.product == productId)
+    const existingProduct = cart.products.find(p => p.productId == productId)
     if(existingProduct){
       existingProduct.quantity +=1;      
     }else{
-      cart.products.push({product: productId, quantity: 1});
+      cart.products.push({productId, quantity: 1});
     }
-    await fs.writeFile(this.path, JSON.stringify(carts,null,2));
+    const result = await this.saveCarts(carts);
+    if (result?.error) return result;
+    return cart;
+  }
+
+  async removeProductFromCart(cartId, productId){
+    const carts = await this.getCarts();
+    const cart = carts.find(c => c.id == cartId);
+
+    if(!cart) return {error: 'carrito no encontrado'}
+
+    const index = cart.products.findIndex(p => p.productId == productId);
+    if(index === -1) return {error: 'producto no encontrado en el carrito'}
+
+    cart.products.splice(index, 1);
+    const result = await this.saveCarts(carts);
+    if (result?.error) return result;
     return cart;
   }
 
