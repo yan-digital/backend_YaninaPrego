@@ -1,105 +1,97 @@
+import { ProductModel } from "../models/product.model.js";
 
-import {promises as fs} from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+class ProductManager {
+  async getProducts({ limit = 10, page = 1, sort, query } = {}) {
+    try {
+      const filter = {};
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+      if (query) {
+        if (query == "true" || query == "false") {
+          filter.available = query == "true";
+        } else {
+          filter.category = query;
+        }
+      }
 
-class ProductManager{
-  constructor(filePath){
-    this.path = path.resolve(__dirname, '..', filePath);
-  }
-  
-    async save(products){
-      await fs.writeFile(this.path, JSON.stringify(products, null, 2));
-  }
+      let sortOption = {};
+      if (sort === "asc") {
+        sortOption.price = 1;
+      } else if (sort === "desc") {
+        sortOption.price = -1;
+      }
 
-  async getProducts(){
-    try{
-      const data = await fs.readFile(this.path, 'utf-8');
-      return JSON.parse(data);
-    }catch{
-      return [];
+      const options = {
+        page: Number(page),
+        limit: Number(limit),
+        sort: sortOption,
+        lean: true,
+      };
+
+      const result = await ProductModel.paginate(filter, options);
+      return {
+        status: "success",
+        payload: result.docs,
+        totalPages: result.totalPages,
+        prevPage: result.hasPrevPage ? result.prevPage : null,
+        nextPage: result.hasNextPage ? result.nextPage : null,
+        page: result.page,
+        hasPrevPage: result.hasPrevPage,
+        hasNextPage: result.hasNextPage,
+        prevLink: result.hasPrevPage
+          ? `/api/products?limit=${limit}&page=${result.prevPage}${
+              sort ? `&sort=${sort}` : ""
+            }${query ? `&query=${query}` : ""}`
+          : null,
+        nextLink: result.hasNextPage
+          ? `/api/products?limit=${limit}&page=${result.nextPage}${
+              sort ? `&sort=${sort}` : ""
+            }${query ? `&query=${query}` : ""}`
+          : null,
+      };
+    } catch (error) {
+      throw new Error(`Error al obtener los productos: ${error.message}`);
     }
   }
 
-  async getProductById(id){
-    const products = await this.getProducts();
-    return products.find(p => p.id == id);
-  }
-
-  async addProduct(productData){
-    const { title, author, price, stock, category } = productData;
-    if(!title || !author || price == null || stock == null || !category){
-      return {error: 'Faltan campos obligatorios'};
-    } 
-
-    const parsedPrice = Number(price);
-    const parsedStock = Number(stock);
-
-    if(parsedPrice <=0 || parsedStock <= 0 || isNaN(parsedPrice) || isNaN(parsedStock)){
-        return {error: 'El precio y el stock deben ser numeros mayores que cero'};
-    }
-
-    const products = await this.getProducts();
-    const newId = products.length > 0 ? products.at(-1).id + 1 : 1;
-    const newProduct = {
-      id: newId,
-      title: productData.title,
-      author: productData.author,
-      price: parsedPrice,
-      stock: parsedStock,
-      category: productData.category,
-      thumbnail: productData.thumbnail || []
-    }
-    try{
-      products.push(newProduct);
-      await this.save(products);
-      return newProduct;
-    } catch(err){
-      return {error: 'no se pudo guardar el producto'};
+  async getProductById(id) {
+    try {
+      const product = await ProductModel.findById(id).lean();
+      return product;
+    } catch (error) {
+      throw new Error(`Error al obtener el producto: ${error.message}`);
     }
   }
 
-  async updateProduct(id, updates){
-    const products = await this.getProducts();
-    const index = products.findIndex(p => p.id == id);
+  async addProduct(productData) {
+    const { title, author, description, price, category, stock } = productData;
+    if (
+      !title ||
+      !author ||
+      !description ||
+      price == null ||
+      !category ||
+      stock == null
+    ) {
+      throw new Error("Faltan campos obligatorios para agregar el producto");
+    }
 
-    if (index == -1) return {error: 'no se encontro producto'};
-
-    delete updates.id;
-
-    const allowedFields = ['title', 'author', 'price', 'stock', 'category', 'thumbnail'];
-
-    Object.keys(updates).forEach(key => {
-      if (!allowedFields.includes(key)) delete updates[key];
-    });
-
-    products[index] = {...products[index], ...updates};
-
-    try{
-      await this.save(products);
-      return products[index];
-    }catch(err){
-      return {error: 'no se pudo actualizar el producto'};
-    } 
+    const newProduct = await ProductModel.create(productData);
+    return newProduct;
   }
 
-  async deleteProduct(id){
-    const products = await this.getProducts();
-    const filtered = products.filter(p => p.id != id);
+  async updateProduct(id, updateData) {
+    const updated = await ProductModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+    }).lean();
 
-    if(filtered.length === products.length){
-      return {error: 'no se encontro producto'};
-    }
+    if (!updated) throw new Error("Producto no encontrado");
+    return updated;
+  }
 
-    try{
-      await this.save(filtered);
-      return {message: `producto ${id} eliminado`};
-    }catch(err){
-      return {error: 'no se pudo eliminar el producto'};
-    }
+  async deleteProduct(id) {
+    const deleted = await ProductModel.findByIdAndDelete(id);
+    if (!deleted) throw new Error("Producto no encontrado");
+    return { message: "Producto eliminado correctamente" };
   }
 }
 

@@ -1,0 +1,29 @@
+<h1>📚 Catálogo de Libros</h1>
+
+{{#each products}}
+<div class="card">
+  <h3>{{this.title}}</h3>
+  <p><strong>Autor:</strong> {{this.author}}</p>
+  <p><strong>Género:</strong> {{this.category}}</p>
+  <p><strong>Precio:</strong> ${{this.price}}</p>
+
+  <form action="/api/carts/{{../cartId}}/product/{{this._id}}" method="POST">
+    <button type="submit">Agregar al carrito 🛒</button>
+  </form>
+</div>
+{{/each}}
+
+<div class="pagination">
+  {{#if pagination.hasPrevPage}}
+  <a href="{{pagination.prevLink}}">← Anterior</a>
+  {{/if}}
+
+  <span>Página {{pagination.page}} de {{pagination.totalPages}}</span>
+
+  {{#if pagination.hasNextPage}}
+  <a href="{{pagination.nextLink}}">Siguiente →</a>
+  {{/if}}
+</div>
+
+<a href="/carts/{{cartId}}">Ver carrito</a>
+

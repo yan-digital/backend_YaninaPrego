@@ -1,24 +1,36 @@
 import {Router} from 'express';
 import ProductManager from '../managers/ProductManager.js';
-import { io } from '../server.js';
 
 const router = Router();
+const pm = new ProductManager();
 
-const productManager = new ProductManager('data/product.json');
+router.get('/', async (req,res)=>{
+  try{
+    const { limit, page, sort, query } = req.query;
+    const result = await pm.getProducts({ limit, page, sort, query });
+    res.json(result);
+  }
+  catch (error) {
+    res.status(500).json({ status: 'error',message: error.message });
+  }
+});
 
 router.post('/', async (req,res)=>{
-  const newProduct = await productManager.addProduct(req.body);
-  if(newProduct.error){
-    return res.status(400).json(newProduct);
+  try{
+    const newProduct = await pm.addProduct(req.body);
+    res.status(201).json({ status: 'success', payload: newProduct });
+  } catch (error) {
+    res.status(400).json({ status: 'error', message: error.message });
   }
-  io.emit('productosActualizados');
-  res.status(201).json(newProduct);
 });
 
 router.delete('/:pid', async (req,res)=>{
-  const result = await productManager.deleteProduct(req.params.pid);
-  io.emit('productosActualizados');
-  res.json(result);
+  try{
+    const result = await pm.deleteProduct(req.params.pid);
+    res.json({ status: 'success', message: 'Producto eliminado correctamente' });
+  } catch (error) {
+    res.status(404).json({ status: 'error', message: error.message });
+  }
 });
 
 export default router;

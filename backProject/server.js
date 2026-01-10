@@ -1,43 +1,40 @@
-import express from 'express';
-import { engine } from 'express-handlebars';
-import productsRouter from './routers/products.router.js';
-import cartsRouter from './routers/carts.router.js';
-import viewsRouter from './routers/views.router.js';
-import { Server } from 'socket.io';
-import ProductManager from './managers/ProductManager.js';
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import { engine } from "express-handlebars";
+import path from "path";
+
+import productsRouter from "./routers/products.router.js";
+import cartsRouter from "./routers/carts.router.js";
+import viewsRouter from "./routers/views.router.js";
+
+dotenv.config();
 
 const app = express();
-
 const PORT = 8080;
 
+// Middlewares
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-app.use(express.static('/public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(process.cwd(), "public")));
 
-app.use('/api/products', productsRouter);
-app.use('/api/carts', cartsRouter);
+// Handlebars
+app.engine("handlebars", engine());
+app.set("view engine", "handlebars");
+app.set("views", "./views");
 
-app.engine('handlebars', engine());
-app.set('view engine', 'handlebars');
-app.set('views', './views');
+// Routes
+app.use("/api/products", productsRouter);
+app.use("/api/carts", cartsRouter);
+app.use("/", viewsRouter);
 
-app.use('/', viewsRouter);
+// MongoDB
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => console.log("✅ Conectado a MongoDB"))
+  .catch((err) => console.log("❌ Error MongoDB:", err));
 
-const productManager = new ProductManager('data/product.json');
-
-const httpServer = app.listen(PORT, ()=>{
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
-});
-
-export const io = new Server(httpServer);
-
-io.on('connection', (socket)=>{
-  console.log('Nuevo cliente conectado');
-
-  socket.on('nuevoProducto', async data =>{
-    await productManager.addProduct(data);
-    const productosActualizados = await productManager.getProducts();
-    io.emit('productosActualizados', productosActualizados);
-  });
-
+// Server
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor escuchando en puerto ${PORT}`);
 });
