@@ -25,7 +25,7 @@ router.put("/:cid/products/:pid", async (req, res) => {
 
   req.app.get("io").emit("cartUpdated", {
     cid: req.params.cid,
-    cart
+    cart,
   });
 
   res.json({ status: "success" });
@@ -39,7 +39,7 @@ router.delete("/:cid/products/:pid", async (req, res) => {
 
   req.app.get("io").emit("cartUpdated", {
     cid: req.params.cid,
-    cart
+    cart,
   });
 
   res.json({ status: "success" });
@@ -50,11 +50,10 @@ router.delete("/:cid", async (req, res) => {
 
   req.app.get("io").emit("cartUpdated", {
     cid: req.params.cid,
-    cart
+    cart,
   });
 
   res.json({ status: "success" });
 });
 
 export default router;
-

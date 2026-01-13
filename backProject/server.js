@@ -17,31 +17,37 @@ const PORT = 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(process.cwd(), "public")));
-app.use(session({
-  secret: 'secreto',
-  resave: false,
-  saveUninitialized: true
-}));
+app.use(
+  session({
+    secret: "secreto",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
-app.engine("handlebars", engine({
-  helpers: {
-    multiply: (a, b) => a * b,
-    eq: (a, b) => a === b,
-    cartTotal: (products) => {
-      if (!Array.isArray(products)) return 0;
-      return products.reduce(
-        (acc, item) => acc + (item.product.price * item.quantity), 0
-      );
+app.engine(
+  "handlebars",
+  engine({
+    helpers: {
+      multiply: (a, b) => a * b,
+      eq: (a, b) => a === b,
+      cartTotal: (products) => {
+        if (!Array.isArray(products)) return 0;
+        return products.reduce(
+          (acc, item) => acc + item.product.price * item.quantity,
+          0
+        );
+      },
     },
-  }
-}));
+  })
+);
 app.set("view engine", "handlebars");
 app.set("views", path.join(process.cwd(), "views"));
 
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log("✅ Conectado a MongoDB"))
-  .catch(err => console.log("❌ Error MongoDB:", err));
+  .catch((err) => console.log("❌ Error MongoDB:", err));
 
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartsRouter);

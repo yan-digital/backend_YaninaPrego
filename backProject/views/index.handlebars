@@ -1,17 +1,11 @@
 <h1>📚 Catálogo de Libros</h1>
 
-<form action="/products" method="GET" style="margin-bottom: 20px;">
-  <input
-    type="text"
-    name="query"
-    placeholder="Título o autor..."
-    value="{{query}}"
-  />
+<form action="/" method="GET">
+  <input type="text" name="query" placeholder="Título o autor..." value="{{query}}" />
   <button type="submit">🔍 Buscar</button>
 </form>
 
-
-<form method="GET" action="/products" style="margin-bottom:20px">
+<form method="GET" action="/">
   <label>
     Categoría:
     <select name="query">
@@ -43,39 +37,34 @@
   <button type="submit">Filtrar 🔍</button>
 </form>
 
-
 <div id="products-container">
   {{#each products}}
-    <div class="card" data-product-id="{{this._id}}">
-      <img src="{{this.thumbnail}}" alt="{{this.title}}" width="150" />
-      <h3>{{this.title}}</h3>
-      <p><strong>Autor:</strong> {{this.author}}</p>
-      <p><strong>Género:</strong> {{this.category}}</p>
-      <p><strong>Precio:</strong> ${{this.price}}</p>
-<a href="/products/{{this._id}}">Ver detalles 📖</a>
+  <div class="card" data-product-id="{{this._id}}">
+    <img src="{{this.thumbnail}}" alt="{{this.title}}" />
+    <h3>{{this.title}}</h3>
+    <p><strong>Autor:</strong> {{this.author}}</p>
+    <p><strong>Género:</strong> {{this.category}}</p>
+    <p><strong>Precio:</strong> ${{this.price}}</p>
+    <a href="/products/{{this._id}}">Ver detalles</a>
 
-<button
-  class="add-to-cart"
-  data-product-id="{{this._id}}"
->
-  Agregar al carrito 🛒
-</button>
-    </div>
+    <button class="add-to-cart" data-product-id="{{this._id}}">
+      Agregar al carrito 🛒
+    </button>
+  </div>
   {{/each}}
 </div>
 
 <div class="pagination">
   {{#if pagination.hasPrevPage}}
-    <a href="{{pagination.prevLink}}">← Anterior</a>
+  <a href="{{pagination.prevLink}}">← Anterior</a>
   {{/if}}
 
   <span>Página {{pagination.page}} de {{pagination.totalPages}}</span>
 
   {{#if pagination.hasNextPage}}
-    <a href="{{pagination.nextLink}}">Siguiente →</a>
+  <a href="{{pagination.nextLink}}">Siguiente →</a>
   {{/if}}
 </div>
-
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/products.js"></script>

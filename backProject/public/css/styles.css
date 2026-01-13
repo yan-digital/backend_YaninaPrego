@@ -111,6 +111,29 @@ button:disabled {
   color: white;
 }
 
+.cart-summary {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+#clear-cart {
+  width: auto;
+  padding: 0.6rem 1.2rem;
+  background-color: #c0392b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+#clear-cart:hover {
+  background-color: #a93226;
+}
+
 #clear-cart {
   background: #6c757d;
   color: white;
@@ -129,6 +152,7 @@ button:disabled {
 }
 
 .pagination {
+  margin: auto;
   margin-top: 2rem;
   display: flex;
   align-items: center;

@@ -6,7 +6,7 @@ const router = Router();
 const pm = new ProductManager();
 const cm = new CartManager();
 
-router.get("/products", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const { limit, page, sort, query } = req.query;
     const result = await pm.getProducts({ limit, page, sort, query });
@@ -29,7 +29,7 @@ router.get("/products", async (req, res) => {
 router.get("/products/:pid", async (req, res) => {
   try {
     const product = await pm.getProductById(req.params.pid);
-      
+
     if (!req.session.cartId) {
       const newCart = await cm.createCart();
       req.session.cartId = newCart._id.toString();
