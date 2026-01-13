@@ -1,10 +1,10 @@
 {
   "name": "backproject",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon backProject/server.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-handlebars": "^8.0.3",
+    "express-session": "^1.18.2",
     "mongodb": "^7.0.0",
     "mongoose": "^9.1.2",
     "mongoose-paginate-v2": "^1.9.1",

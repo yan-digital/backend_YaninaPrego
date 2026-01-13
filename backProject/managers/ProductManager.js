@@ -1,33 +1,32 @@
-import { ProductModel } from "../models/product.model.js";
+import ProductModel from "../models/product.model.js";
 
 class ProductManager {
   async getProducts({ limit = 10, page = 1, sort, query } = {}) {
     try {
       const filter = {};
+if (query) {
+  const q = query.toLowerCase();
 
-      if (query) {
-        if (query == "true" || query == "false") {
-          filter.available = query == "true";
-        } else {
-          filter.category = query;
-        }
-      }
-
-      let sortOption = {};
-      if (sort === "asc") {
-        sortOption.price = 1;
-      } else if (sort === "desc") {
-        sortOption.price = -1;
-      }
+  if (q === "true" || q === "false") {
+    filter.available = q === "true";
+  } else {
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } },
+      { author: { $regex: q, $options: "i" } },
+      { category: { $regex: q, $options: "i" } }
+    ];
+  }
+}
 
       const options = {
-        page: Number(page),
-        limit: Number(limit),
-        sort: sortOption,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        sort: sort === "asc" ? { price: 1 } : sort === "desc" ? { price: -1 } : {},
         lean: true,
       };
 
       const result = await ProductModel.paginate(filter, options);
+
       return {
         status: "success",
         payload: result.docs,
@@ -37,16 +36,8 @@ class ProductManager {
         page: result.page,
         hasPrevPage: result.hasPrevPage,
         hasNextPage: result.hasNextPage,
-        prevLink: result.hasPrevPage
-          ? `/api/products?limit=${limit}&page=${result.prevPage}${
-              sort ? `&sort=${sort}` : ""
-            }${query ? `&query=${query}` : ""}`
-          : null,
-        nextLink: result.hasNextPage
-          ? `/api/products?limit=${limit}&page=${result.nextPage}${
-              sort ? `&sort=${sort}` : ""
-            }${query ? `&query=${query}` : ""}`
-          : null,
+        prevLink: result.hasPrevPage ? `/products?limit=${limit}&page=${result.prevPage}${sort ? `&sort=${sort}` : ""}${query ? `&query=${query}` : ""}` : null,
+        nextLink: result.hasNextPage ? `/products?limit=${limit}&page=${result.nextPage}${sort ? `&sort=${sort}` : ""}${query ? `&query=${query}` : ""}` : null,
       };
     } catch (error) {
       throw new Error(`Error al obtener los productos: ${error.message}`);

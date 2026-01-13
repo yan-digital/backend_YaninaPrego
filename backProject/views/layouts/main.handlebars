@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8" />
     <title>Tiendita de Libros</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
+
+<body data-cart-id="{{cartId}}">
     <header>
         <h1>Bienvenido a la Tiendita de Libros</h1>
         <nav>
-            <a href="/">Inicio</a>
             <a href="/products">Productos</a>
             <a href="/cart">Carrito</a>
         </nav>
@@ -18,4 +19,7 @@
         {{{body}}}
     </main>
 </body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/cart.js"></script>
+
 </html>

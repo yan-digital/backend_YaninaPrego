@@ -1,6 +1,6 @@
 <h1>{{product.title}}</h1>
 
-<div class="card">
+<div class="card" data-product-id="{{product._id}}">
   <img src="{{product.thumbnail}}" alt="{{product.title}}" width="150">
   <p><strong>Autor:</strong> {{product.author}}</p>
   <p><strong>Descripción:</strong></p>
@@ -8,10 +8,14 @@
   <p><strong>Categoría:</strong> {{product.category}}</p>
   <p><strong>Precio:</strong> ${{product.price}}</p>
 
-  <form action="/api/carts/{{cartId}}/products/{{product._id}}" method="post">
-    <button type="submit">Agregar al carrito ❤️</button>
-  </form>
-
-  <br>
+<button
+  class="add-to-cart"
+  data-product-id="{{product._id}}"
+>
+  Agregar al carrito 🛒
+</button>
   <a href="/products">⬅ Volver</a>
 </div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/products.js"></script>

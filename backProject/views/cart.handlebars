@@ -1,15 +1,35 @@
-<h1>Tu carrito 🛒 </h1>
+<h1>Tu carrito 🛒</h1>
 
+<div 
+  id="cart-container"
+  data-cart-id ="{{cart._id}}">
 {{#if cart.products.length}}
-{{#each cart.products}}
-<div class="card">
-  <h3>{{this.product.title}}</h3>
-  <p>Precio: ${{this.product.price}}</p>
-  <p>Cantidad: {{this.quantity}}</p>
-</div>
-{{/each}}
-{{else}}
-<p>El carrito está vacío 😢</p>
-{{/if}}
+  {{#each cart.products}}
+  <div class="card" data-product-id="{{this.product._id}}">
+    <img src="{{this.product.thumbnail}}" alt="{{this.product.title}}" width="120">
+    <h3>{{this.product.title}}</h3>
+    <p>Precio: ${{this.product.price}}</p>
+    <p>Cantidad: <span class="quantity">{{this.quantity}}</span></p>
+    <p><strong>Subtotal:</strong> $<span class="subtotal">{{multiply this.product.price this.quantity}}</span></p>
 
-<a href="/products">Seguir comprando ❤️</a>
+    <button class="increase">➕</button>
+    <button class="decrease" {{#if (eq this.quantity 1)}}disabled{{/if}}>➖</button>
+    <input type="number" class="quantity-input" value="{{this.quantity}}" min="1">
+    <button class="delete-product">❌ Eliminar</button>
+  </div>
+  {{/each}}
+
+  <h2>Total: $<span id="cart-total">{{cartTotal cart.products}}</span></h2>
+  <button id="clear-cart">🧹 Vaciar carrito</button>
+{{else}}
+  <p>El carrito está vacío 😢</p>
+{{/if}}
+</div>
+
+<a href="/products">⬅ Volver al catálogo</a>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/cart.js"></script>
+
+
+
